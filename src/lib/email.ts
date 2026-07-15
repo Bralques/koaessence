@@ -3,7 +3,13 @@ import { render } from "@react-email/components";
 import OrderConfirmation from "@/emails/OrderConfirmation";
 import PaymentConfirmed from "@/emails/PaymentConfirmed";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | undefined;
+
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+
 const FROM = "KOA <onboarding@resend.dev>"; // em produção, troque pelo seu domínio verificado
 
 interface OrderItem {
@@ -43,7 +49,7 @@ export async function sendOrderConfirmation({
     OrderConfirmation({ orderId, customerName, total, paymentMethod, items, address })
   );
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: customerEmail,
     subject: `Pedido #${orderId.slice(-8).toUpperCase()} recebido — KOA`,
@@ -68,7 +74,7 @@ export async function sendPaymentConfirmed({
     PaymentConfirmed({ orderId, customerName, total, items })
   );
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: customerEmail,
     subject: `Pagamento confirmado — KOA #${orderId.slice(-8).toUpperCase()}`,

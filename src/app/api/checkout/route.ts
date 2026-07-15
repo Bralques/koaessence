@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { sendOrderConfirmation } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Create Stripe PaymentIntent
-  const paymentIntent = await stripe.paymentIntents.create({
+  const paymentIntent = await getStripe().paymentIntents.create({
     amount: Math.round(total * 100), // centavos
     currency: "brl",
     metadata: { orderId: order.id },
